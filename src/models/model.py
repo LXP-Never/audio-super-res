@@ -6,7 +6,7 @@ import tensorflow as tf
 
 import librosa
 from keras import backend as K
-from dataset import DataSet
+from .dataset import DataSet
 
 # ----------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ class Model(object):
   def create_train_op(self, X, Y, alpha):
     # load params
     opt_params = self.opt_params
-    print 'creating train_op with params:', opt_params
+    print('creating train_op with params:', opt_params)
 
     # create loss
     self.loss = self.create_objective(X, Y, opt_params)
@@ -131,7 +131,7 @@ class Model(object):
 
   def create_gradients(self, loss, params):
     gv = self.optimizer.compute_gradients(loss, params)
-    g, v = zip(*gv)
+    g, v = list(zip(*gv))
     return g
 
   def create_updates(self, params, grads, alpha, opt_params):
@@ -142,7 +142,7 @@ class Model(object):
     grads = [alpha*g for g in grads]
     
     # use the optimizer to apply the gradients that minimize the loss
-    gv = zip(grads, params)
+    gv = list(zip(grads, params))
     train_op = self.optimizer.apply_gradients(gv, global_step=self.global_step)
     
     return train_op
@@ -152,7 +152,7 @@ class Model(object):
     if os.path.isdir(ckpt): checkpoint = tf.train.latest_checkpoint(ckpt)
     else: checkpoint = ckpt
     meta = checkpoint + '.meta'
-    print checkpoint
+    print(checkpoint)
 
     # load graph
     self.saver = tf.train.import_meta_graph(meta)
@@ -226,12 +226,12 @@ class Model(object):
         tr_l2_loss, tr_l2_snr = self.eval_err(X_train, Y_train, n_batch=n_batch)
         va_l2_loss, va_l2_snr = self.eval_err(X_val, Y_val, n_batch=n_batch)
 
-        print "Epoch {} of {} took {:.3f}s ({} minibatches)".format(
-          epoch, n_epoch, end_time - start_time, len(X_train) // n_batch)
-        print "  training l2_loss/segsnr:\t\t{:.6f}\t{:.6f}".format(
-          tr_l2_loss, tr_l2_snr)
-        print "  validation l2_loss/segsnr:\t\t{:.6f}\t{:.6f}".format(
-          va_l2_loss, va_l2_snr)
+        print("Epoch {} of {} took {:.3f}s ({} minibatches)".format(
+          epoch, n_epoch, end_time - start_time, len(X_train) // n_batch))
+        print("  training l2_loss/segsnr:\t\t{:.6f}\t{:.6f}".format(
+          tr_l2_loss, tr_l2_snr))
+        print("  validation l2_loss/segsnr:\t\t{:.6f}\t{:.6f}".format(
+          va_l2_loss, va_l2_snr))
 
         # compute summaries for overall loss
         objectives_summary = tf.Summary()
